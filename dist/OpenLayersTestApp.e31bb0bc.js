@@ -58754,15 +58754,6 @@ var london = new _Feature.default({
 var madrid = new _Feature.default({
   geometry: new _Point.default((0, _proj.fromLonLat)([-3.683333, 40.4]))
 });
-rome.setStyle(new _style.Style({
-  image: new _style.Icon(
-  /** @type {module: ol/style/Icon~Options} */
-  {
-    color: [255, 0, 0],
-    crossOrigin: 'anonymous',
-    src: 'https://openlayers.org/en/v5.3.0/examples/data/icon.png'
-  })
-}));
 setInterval(changeIconStyle, 1000);
 
 function changeIconStyle() {
@@ -58773,63 +58764,32 @@ function changeIconStyle() {
     var redColor = Math.random() * 255;
     var greenColor = Math.random() * 255;
     var blueColor = Math.random() * 255;
+    var iconScale = map.getView().getZoom();
     feature.setStyle(new _style.Style({
       image: new _style.Icon(
       /** @type {module: ol/style/Icon~Options} */
       {
+        // size: [600, 600],
+        scale: iconScale * 0.02,
+        rotation: Math.random() * 360,
+        rotateWithView: true,
         color: [redColor, greenColor, blueColor],
         crossOrigin: 'anonymous',
-        src: 'https://openlayers.org/en/v5.3.0/examples/data/icon.png'
+        // src: 'https://192.168.56.1:8080/icon.png'
+        // src: 'https://openlayers.org/en/v5.3.0/examples/data/icon.png'
+        src: 'resources/airplane2.png'
       })
     }));
   });
 }
 
-london.setStyle(new _style.Style({
-  image: new _style.Icon(
-  /** @type {module: ol/style/Icon~Options} */
-  {
-    anchor: [0.5, 46],
-    anchorXUnits: 'fraction',
-    anchorYUnits: 'pixels',
-    color: '#4271AE',
-    crossOrigin: 'anonymous',
-    src: 'data/icon.png'
-  })
-}));
-madrid.setStyle(new _style.Style({
-  image: new _style.Icon(
-  /** @type {module:ol/style/Icon~Options} */
-  {
-    anchor: [0.5, 46],
-    anchorXUnits: 'fraction',
-    anchorYUnits: 'pixels',
-    src: 'data/icon.png'
-  })
-}));
-var newIconFeature = new _Feature.default({
-  geometry: new _Point.default([0, 0]),
-  name: 'Null Island',
-  population: 4000,
-  rainfall: 500
-});
-var newIconStyle = new _style.Style({
-  image: new _style.Icon(
-  /** @type {module:ol/style/Icon~Options} */
-  {
-    anchor: [0.5, 46],
-    anchorXUnits: 'fraction',
-    anchorYUnits: 'pixels',
-    src: './resources/mario.png'
-  })
-});
 var vectorSource2 = new _source.Vector({
-  features: [rome, london, madrid, newIconFeature]
+  features: [rome, london, madrid]
 });
 var vectorLayer2 = new _layer.Vector({
   source: vectorSource2
 });
-var map = new _Map.default({
+window.map = new _Map.default({
   layers: [new _layer.Tile({
     source: new _source.OSM()
   }), //vectorLayer,
@@ -58868,7 +58828,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49305" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56882" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
