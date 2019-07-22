@@ -8,6 +8,9 @@ import { OSM, Vector as VectorSource } from 'ol/source.js';
 import { Icon, Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style.js';
 import Point from 'ol/geom/Point.js';
 import { fromLonLat } from 'ol/proj.js';
+import CircleSlider from "circle-slider";
+
+
 
 
 var image = new CircleStyle({
@@ -188,14 +191,20 @@ var madrid = new Feature({
 });
 
 
+var vectorSource2 = new VectorSource({
+    features: [rome, london, madrid]
+});
+
+var vectorLayer2 = new VectorLayer({
+    source: vectorSource2
+});
 
 
-setInterval(changeIconStyle, 1000);
+//setInterval(changeIconStyle, 1000);
 
 function changeIconStyle() {
-    var vectoLayer = map.getLayers().getArray()[1];
-    var allFeatures = vectoLayer.getSource().getFeatures();
-    console.log(allFeatures);
+    var vectoLayer2 = map.getLayers().getArray()[1];
+    var allFeatures = vectoLayer2.getSource().getFeatures();
     allFeatures.forEach((feature) => {
         var redColor = Math.random() * 255;
         var greenColor = Math.random() * 255;
@@ -218,13 +227,6 @@ function changeIconStyle() {
 }
 
 
-var vectorSource2 = new VectorSource({
-    features: [rome, london, madrid]
-});
-
-var vectorLayer2 = new VectorLayer({
-    source: vectorSource2
-});
 
 
 
@@ -233,7 +235,7 @@ window.map = new Map({
         new TileLayer({
             source: new OSM()
         }),
-        //vectorLayer,
+        vectorLayer,
         vectorLayer2
     ],
     target: 'map',
@@ -242,3 +244,40 @@ window.map = new Map({
         zoom: 2
     })
 });
+
+window.addMainAirplane = function () {
+    var airPlaneFeature = new Feature({
+        geometry: new Point(fromLonLat([34, 33]))
+    });
+    airPlaneFeature.setStyle(new Style({
+        image: new Icon(/** @type {module: ol/style/Icon~Options} */({
+            // size: [600, 600],
+            scale: 0.05,
+            rotateWithView: true,
+            color: [255, 255, 0],
+            crossOrigin: 'anonymous',
+            // src: 'https://192.168.56.1:8080/icon.png'
+            // src: 'https://openlayers.org/en/v5.3.0/examples/data/icon.png'
+            src: 'resources/airplane2.png'
+        }))
+    }))
+    var airplaneCompasFeature = new Feature({
+        geometry: new Circle(fromLonLat([34, 33]), 10000000),
+    }
+    );
+    airplaneCompasFeature.setStyle(
+        new Style({
+            stroke: new Stroke({
+                color: 'white',
+                width: 20
+            }),
+            fill: new Fill({
+                color: 'rgba(255,255,255,0.2)'
+            })
+        })
+    )
+    vectorSource.addFeature(airPlaneFeature);
+    vectorSource.addFeature(airplaneCompasFeature);
+
+}
+

@@ -58573,7 +58573,578 @@ var _Style = _interopRequireDefault(require("./style/Style.js"));
 var _Text = _interopRequireDefault(require("./style/Text.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-},{"./style/Atlas.js":"node_modules/ol/style/Atlas.js","./style/AtlasManager.js":"node_modules/ol/style/AtlasManager.js","./style/Circle.js":"node_modules/ol/style/Circle.js","./style/Fill.js":"node_modules/ol/style/Fill.js","./style/Icon.js":"node_modules/ol/style/Icon.js","./style/IconImage.js":"node_modules/ol/style/IconImage.js","./style/Image.js":"node_modules/ol/style/Image.js","./style/RegularShape.js":"node_modules/ol/style/RegularShape.js","./style/Stroke.js":"node_modules/ol/style/Stroke.js","./style/Style.js":"node_modules/ol/style/Style.js","./style/Text.js":"node_modules/ol/style/Text.js"}],"index.js":[function(require,module,exports) {
+},{"./style/Atlas.js":"node_modules/ol/style/Atlas.js","./style/AtlasManager.js":"node_modules/ol/style/AtlasManager.js","./style/Circle.js":"node_modules/ol/style/Circle.js","./style/Fill.js":"node_modules/ol/style/Fill.js","./style/Icon.js":"node_modules/ol/style/Icon.js","./style/IconImage.js":"node_modules/ol/style/IconImage.js","./style/Image.js":"node_modules/ol/style/Image.js","./style/RegularShape.js":"node_modules/ol/style/RegularShape.js","./style/Stroke.js":"node_modules/ol/style/Stroke.js","./style/Style.js":"node_modules/ol/style/Style.js","./style/Text.js":"node_modules/ol/style/Text.js"}],"node_modules/eventemitter3/index.js":[function(require,module,exports) {
+'use strict';
+
+var has = Object.prototype.hasOwnProperty
+  , prefix = '~';
+
+/**
+ * Constructor to create a storage for our `EE` objects.
+ * An `Events` instance is a plain object whose properties are event names.
+ *
+ * @constructor
+ * @api private
+ */
+function Events() {}
+
+//
+// We try to not inherit from `Object.prototype`. In some engines creating an
+// instance in this way is faster than calling `Object.create(null)` directly.
+// If `Object.create(null)` is not supported we prefix the event names with a
+// character to make sure that the built-in object properties are not
+// overridden or used as an attack vector.
+//
+if (Object.create) {
+  Events.prototype = Object.create(null);
+
+  //
+  // This hack is needed because the `__proto__` property is still inherited in
+  // some old browsers like Android 4, iPhone 5.1, Opera 11 and Safari 5.
+  //
+  if (!new Events().__proto__) prefix = false;
+}
+
+/**
+ * Representation of a single event listener.
+ *
+ * @param {Function} fn The listener function.
+ * @param {Mixed} context The context to invoke the listener with.
+ * @param {Boolean} [once=false] Specify if the listener is a one-time listener.
+ * @constructor
+ * @api private
+ */
+function EE(fn, context, once) {
+  this.fn = fn;
+  this.context = context;
+  this.once = once || false;
+}
+
+/**
+ * Minimal `EventEmitter` interface that is molded against the Node.js
+ * `EventEmitter` interface.
+ *
+ * @constructor
+ * @api public
+ */
+function EventEmitter() {
+  this._events = new Events();
+  this._eventsCount = 0;
+}
+
+/**
+ * Return an array listing the events for which the emitter has registered
+ * listeners.
+ *
+ * @returns {Array}
+ * @api public
+ */
+EventEmitter.prototype.eventNames = function eventNames() {
+  var names = []
+    , events
+    , name;
+
+  if (this._eventsCount === 0) return names;
+
+  for (name in (events = this._events)) {
+    if (has.call(events, name)) names.push(prefix ? name.slice(1) : name);
+  }
+
+  if (Object.getOwnPropertySymbols) {
+    return names.concat(Object.getOwnPropertySymbols(events));
+  }
+
+  return names;
+};
+
+/**
+ * Return the listeners registered for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Boolean} exists Only check if there are listeners.
+ * @returns {Array|Boolean}
+ * @api public
+ */
+EventEmitter.prototype.listeners = function listeners(event, exists) {
+  var evt = prefix ? prefix + event : event
+    , available = this._events[evt];
+
+  if (exists) return !!available;
+  if (!available) return [];
+  if (available.fn) return [available.fn];
+
+  for (var i = 0, l = available.length, ee = new Array(l); i < l; i++) {
+    ee[i] = available[i].fn;
+  }
+
+  return ee;
+};
+
+/**
+ * Calls each of the listeners registered for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @returns {Boolean} `true` if the event had listeners, else `false`.
+ * @api public
+ */
+EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) return false;
+
+  var listeners = this._events[evt]
+    , len = arguments.length
+    , args
+    , i;
+
+  if (listeners.fn) {
+    if (listeners.once) this.removeListener(event, listeners.fn, undefined, true);
+
+    switch (len) {
+      case 1: return listeners.fn.call(listeners.context), true;
+      case 2: return listeners.fn.call(listeners.context, a1), true;
+      case 3: return listeners.fn.call(listeners.context, a1, a2), true;
+      case 4: return listeners.fn.call(listeners.context, a1, a2, a3), true;
+      case 5: return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
+      case 6: return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
+    }
+
+    for (i = 1, args = new Array(len -1); i < len; i++) {
+      args[i - 1] = arguments[i];
+    }
+
+    listeners.fn.apply(listeners.context, args);
+  } else {
+    var length = listeners.length
+      , j;
+
+    for (i = 0; i < length; i++) {
+      if (listeners[i].once) this.removeListener(event, listeners[i].fn, undefined, true);
+
+      switch (len) {
+        case 1: listeners[i].fn.call(listeners[i].context); break;
+        case 2: listeners[i].fn.call(listeners[i].context, a1); break;
+        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break;
+        case 4: listeners[i].fn.call(listeners[i].context, a1, a2, a3); break;
+        default:
+          if (!args) for (j = 1, args = new Array(len -1); j < len; j++) {
+            args[j - 1] = arguments[j];
+          }
+
+          listeners[i].fn.apply(listeners[i].context, args);
+      }
+    }
+  }
+
+  return true;
+};
+
+/**
+ * Add a listener for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn The listener function.
+ * @param {Mixed} [context=this] The context to invoke the listener with.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.on = function on(event, fn, context) {
+  var listener = new EE(fn, context || this)
+    , evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
+  else if (!this._events[evt].fn) this._events[evt].push(listener);
+  else this._events[evt] = [this._events[evt], listener];
+
+  return this;
+};
+
+/**
+ * Add a one-time listener for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn The listener function.
+ * @param {Mixed} [context=this] The context to invoke the listener with.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.once = function once(event, fn, context) {
+  var listener = new EE(fn, context || this, true)
+    , evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
+  else if (!this._events[evt].fn) this._events[evt].push(listener);
+  else this._events[evt] = [this._events[evt], listener];
+
+  return this;
+};
+
+/**
+ * Remove the listeners of a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn Only remove the listeners that match this function.
+ * @param {Mixed} context Only remove the listeners that have this context.
+ * @param {Boolean} once Only remove one-time listeners.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.removeListener = function removeListener(event, fn, context, once) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) return this;
+  if (!fn) {
+    if (--this._eventsCount === 0) this._events = new Events();
+    else delete this._events[evt];
+    return this;
+  }
+
+  var listeners = this._events[evt];
+
+  if (listeners.fn) {
+    if (
+         listeners.fn === fn
+      && (!once || listeners.once)
+      && (!context || listeners.context === context)
+    ) {
+      if (--this._eventsCount === 0) this._events = new Events();
+      else delete this._events[evt];
+    }
+  } else {
+    for (var i = 0, events = [], length = listeners.length; i < length; i++) {
+      if (
+           listeners[i].fn !== fn
+        || (once && !listeners[i].once)
+        || (context && listeners[i].context !== context)
+      ) {
+        events.push(listeners[i]);
+      }
+    }
+
+    //
+    // Reset the array, or remove it completely if we have no more listeners.
+    //
+    if (events.length) this._events[evt] = events.length === 1 ? events[0] : events;
+    else if (--this._eventsCount === 0) this._events = new Events();
+    else delete this._events[evt];
+  }
+
+  return this;
+};
+
+/**
+ * Remove all listeners, or those of the specified event.
+ *
+ * @param {String|Symbol} [event] The event name.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
+  var evt;
+
+  if (event) {
+    evt = prefix ? prefix + event : event;
+    if (this._events[evt]) {
+      if (--this._eventsCount === 0) this._events = new Events();
+      else delete this._events[evt];
+    }
+  } else {
+    this._events = new Events();
+    this._eventsCount = 0;
+  }
+
+  return this;
+};
+
+//
+// Alias methods names because people roll like that.
+//
+EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
+EventEmitter.prototype.addListener = EventEmitter.prototype.on;
+
+//
+// This function doesn't apply anymore.
+//
+EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
+  return this;
+};
+
+//
+// Expose the prefix.
+//
+EventEmitter.prefixed = prefix;
+
+//
+// Allow `EventEmitter` to be imported as module namespace.
+//
+EventEmitter.EventEmitter = EventEmitter;
+
+//
+// Expose the module.
+//
+if ('undefined' !== typeof module) {
+  module.exports = EventEmitter;
+}
+
+},{}],"node_modules/circle-slider/lib/index.js":[function(require,module,exports) {
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var EventEmitter = require("eventemitter3");
+
+var CircleSlider = function (_EventEmitter) {
+  _inherits(CircleSlider, _EventEmitter);
+
+  /**
+   * Creates an instance of CircleSlider inside the element with the id `targetId`
+   * @param {String} targetId              The id of the element to contain the circle slider.
+   * @param {Object} [options]             An object containing options for the slider.
+   * @param {Number} [options.snap]        Makes the handle snap to every multiple of this number.
+   * @param {Boolean} [options.clockwise]  True to make clockwise the positive direction.
+   * @param {"top"|"bottom"|"left"|"right"} [options.startPos]
+   *    Which side the handle should start at.
+   * @memberof CircleSlider
+   */
+  function CircleSlider(targetId, options) {
+    _classCallCheck(this, CircleSlider);
+
+    // allow both "id" or "#id"
+    var _this2 = _possibleConstructorReturn(this, (CircleSlider.__proto__ || Object.getPrototypeOf(CircleSlider)).call(this));
+
+    _this2.root = document.getElementById(targetId) || document.getElementById(targetId.slice(1));
+    _this2.outputAngle = 0;
+
+    if (options) {
+      _this2.clockwise = options.clockwise; // affects _formatOutputAngle
+      _this2.snapMultiplier = options.snap;
+      _this2.startPos = options.startPos;
+    } else {
+      _this2.clockwise = false;
+      _this2.snapMultiplier = 0;
+      _this2.startPos = "right";
+    }
+
+    _this2.startOffset = 0; // "right" is default
+
+    switch (_this2.startPos) {
+      case "top":
+        _this2.startOffset = 270;
+        break;
+      case "left":
+        _this2.startOffset = 180;
+        break;
+      case "bottom":
+        _this2.startOffset = 90;
+        break;
+      default:
+        break;
+    }
+
+    // validation
+    if (!_this2.root) {
+      console.error("CircleSlider: Didn't find any element with id " + targetId);
+    }
+
+    // create the child elements and append them
+    _this2.hc = CircleSlider._createHandleContainerElem();
+    _this2.handle = CircleSlider._createHandleElem();
+    _this2.hc.appendChild(_this2.handle);
+    _this2.root.appendChild(_this2.hc);
+
+    // put the handle at the correct position
+    _this2.hc.style.cssText = "transform: rotate(" + _this2.startOffset + "deg);";
+
+    // just to keep track of all event names
+    _this2.events = {
+      sliderMove: "sliderMove",
+      sliderUp: "sliderUp"
+    };
+
+    // active is true when user is holding down handle
+    _this2.active = false;
+    // mouse events
+    _this2._addEventListeners("mousedown", "mousemove", "mouseup");
+    // touch events
+    _this2._addEventListeners("touchstart", "touchmove", "touchend");
+
+    // bind methods
+    _this2._mouseMoveHandler = _this2._mouseMoveHandler.bind(_this2);
+    return _this2;
+  }
+
+  // public methods
+
+  /**
+   * Returns the angle/value of the slider.
+   *
+   * @returns The current value
+   * @memberof CircleSlider
+   */
+
+
+  _createClass(CircleSlider, [{
+    key: "getAngle",
+    value: function getAngle() {
+      return this.outputAngle;
+    }
+
+    /**
+     * Manually sets the angle/value of the slider.
+     *
+     * @param {Number} angle  The new value for the slider
+     * @memberof CircleSlider
+     */
+
+  }, {
+    key: "setAngle",
+    value: function setAngle(angle) {
+      var rawAngle = this._formatInputAngle(angle);
+      this._moveHandle(rawAngle);
+    }
+  }, {
+    key: "_formatInputAngle",
+    value: function _formatInputAngle(angle) {
+      var rawAngle = this.clockwise === true ? CircleSlider.modulo(Math.round(angle) - 360 + this.startOffset, 360) : CircleSlider.modulo(360 - Math.round(angle) + this.startOffset, 360);
+      return rawAngle;
+    }
+
+    // "private" methods
+
+  }, {
+    key: "_addEventListeners",
+    value: function _addEventListeners(startEvent, moveEvent, endEvent) {
+      var _this3 = this;
+
+      // user presses handle
+      this.handle.addEventListener(startEvent, function (e) {
+        // prevent text selection
+        e.preventDefault();
+
+        if (!_this3.active) {
+          _this3.active = true;
+
+          // user moves handle
+          document.addEventListener(moveEvent, _this3._mouseMoveHandler, false);
+
+          // user lets go
+          var _this = _this3;
+          document.addEventListener(endEvent, function endFunc(ev) {
+            _this.active = false;
+            document.removeEventListener(moveEvent, _this._mouseMoveHandler, false);
+            _this.emit(_this.events.sliderUp, _this.outputAngle);
+
+            // remove event listener after this has been fired once
+            ev.currentTarget.removeEventListener(endEvent, endFunc, false);
+          });
+        }
+      });
+    }
+  }, {
+    key: "_mouseMoveHandler",
+    value: function _mouseMoveHandler(e) {
+      e.preventDefault();
+      this._moveHandle(this._getRawAngle(e));
+    }
+  }, {
+    key: "_moveHandle",
+    value: function _moveHandle(rawAngle) {
+      var angle = rawAngle;
+      // snap handle to multiples of snapMultiplier
+      if (this.snapMultiplier) {
+        var sm = this.snapMultiplier;
+        var delta = Math.abs(angle - Math.round(angle / sm) * sm);
+        if (delta <= 5) {
+          angle = Math.round(angle / sm) * sm;
+        }
+      }
+
+      // move the handle visually
+      this.hc.style.cssText = "transform: rotate(" + angle + "deg);";
+
+      this.outputAngle = this._formatOutputAngle(angle);
+
+      this.emit(this.events.sliderMove, this.outputAngle);
+    }
+  }, {
+    key: "_formatOutputAngle",
+    value: function _formatOutputAngle(angle) {
+      var outputAngle = this.clockwise === true ? CircleSlider.modulo(360 + Math.round(angle) - this.startOffset, 360) : CircleSlider.modulo(360 - Math.round(angle) + this.startOffset, 360);
+      return outputAngle;
+    }
+  }, {
+    key: "_getRawAngle",
+    value: function _getRawAngle(e) {
+      var pivot = CircleSlider._getCenter(this.root);
+      var mouse = void 0;
+      if (e.type === "touchmove") {
+        mouse = {
+          x: e.touches[0].clientX,
+          y: e.touches[0].clientY
+        };
+      } else {
+        mouse = {
+          x: e.clientX,
+          y: e.clientY
+        };
+      }
+
+      var angle = CircleSlider._radToDeg(Math.atan2(mouse.y - pivot.y, mouse.x - pivot.x)) % 360;
+      return angle;
+    }
+  }], [{
+    key: "_getCenter",
+    value: function _getCenter(elem) {
+      var rect = elem.getBoundingClientRect();
+      return {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2
+      };
+    }
+  }, {
+    key: "_radToDeg",
+    value: function _radToDeg(rad) {
+      return rad * (180 / Math.PI);
+    }
+
+    // % can return negative numbers
+
+  }, {
+    key: "modulo",
+    value: function modulo(n, m) {
+      return (n % m + m) % m;
+    }
+
+    // Uninteresting methods
+
+  }, {
+    key: "_createHandleContainerElem",
+    value: function _createHandleContainerElem() {
+      var hc = document.createElement("div");
+      hc.className = "cs-handle-container";
+      return hc;
+    }
+  }, {
+    key: "_createHandleElem",
+    value: function _createHandleElem() {
+      var h = document.createElement("div");
+      h.className = "cs-handle";
+      return h;
+    }
+  }]);
+
+  return CircleSlider;
+}(EventEmitter);
+
+module.exports = CircleSlider;
+
+},{"eventemitter3":"node_modules/eventemitter3/index.js"}],"index.js":[function(require,module,exports) {
 "use strict";
 
 var _Feature = _interopRequireDefault(require("ol/Feature.js"));
@@ -58595,6 +59166,8 @@ var _style = require("ol/style.js");
 var _Point = _interopRequireDefault(require("ol/geom/Point.js"));
 
 var _proj = require("ol/proj.js");
+
+var _circleSlider = _interopRequireDefault(require("circle-slider"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -58754,23 +59327,27 @@ var london = new _Feature.default({
 var madrid = new _Feature.default({
   geometry: new _Point.default((0, _proj.fromLonLat)([-3.683333, 40.4]))
 });
-setInterval(changeIconStyle, 1000);
+var vectorSource2 = new _source.Vector({
+  features: [rome, london, madrid]
+});
+var vectorLayer2 = new _layer.Vector({
+  source: vectorSource2
+}); //setInterval(changeIconStyle, 1000);
 
 function changeIconStyle() {
-  var vectoLayer = map.getLayers().getArray()[1];
-  var allFeatures = vectoLayer.getSource().getFeatures();
-  console.log(allFeatures);
+  var vectoLayer2 = map.getLayers().getArray()[1];
+  var allFeatures = vectoLayer2.getSource().getFeatures();
   allFeatures.forEach(function (feature) {
     var redColor = Math.random() * 255;
     var greenColor = Math.random() * 255;
     var blueColor = Math.random() * 255;
-    var iconScale = map.getView().getZoom();
+    var mapZoom = map.getView().getZoom();
     feature.setStyle(new _style.Style({
       image: new _style.Icon(
       /** @type {module: ol/style/Icon~Options} */
       {
         // size: [600, 600],
-        scale: iconScale * 0.02,
+        scale: mapZoom * 0.02,
         rotation: Math.random() * 360,
         rotateWithView: true,
         color: [redColor, greenColor, blueColor],
@@ -58783,24 +59360,51 @@ function changeIconStyle() {
   });
 }
 
-var vectorSource2 = new _source.Vector({
-  features: [rome, london, madrid]
-});
-var vectorLayer2 = new _layer.Vector({
-  source: vectorSource2
-});
 window.map = new _Map.default({
   layers: [new _layer.Tile({
     source: new _source.OSM()
-  }), //vectorLayer,
-  vectorLayer2],
+  }), vectorLayer, vectorLayer2],
   target: 'map',
   view: new _View.default({
     center: [0, 0],
     zoom: 2
   })
 });
-},{"ol/Feature.js":"node_modules/ol/Feature.js","ol/Map.js":"node_modules/ol/Map.js","ol/View.js":"node_modules/ol/View.js","ol/format/GeoJSON.js":"node_modules/ol/format/GeoJSON.js","ol/geom/Circle.js":"node_modules/ol/geom/Circle.js","ol/layer.js":"node_modules/ol/layer.js","ol/source.js":"node_modules/ol/source.js","ol/style.js":"node_modules/ol/style.js","ol/geom/Point.js":"node_modules/ol/geom/Point.js","ol/proj.js":"node_modules/ol/proj.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+
+window.addMainAirplane = function () {
+  var airPlaneFeature = new _Feature.default({
+    geometry: new _Point.default((0, _proj.fromLonLat)([34, 33]))
+  });
+  airPlaneFeature.setStyle(new _style.Style({
+    image: new _style.Icon(
+    /** @type {module: ol/style/Icon~Options} */
+    {
+      // size: [600, 600],
+      scale: 0.05,
+      rotateWithView: true,
+      color: [255, 255, 0],
+      crossOrigin: 'anonymous',
+      // src: 'https://192.168.56.1:8080/icon.png'
+      // src: 'https://openlayers.org/en/v5.3.0/examples/data/icon.png'
+      src: 'resources/airplane2.png'
+    })
+  }));
+  var airplaneCompasFeature = new _Feature.default({
+    geometry: new _Circle.default((0, _proj.fromLonLat)([34, 33]), 10000000)
+  });
+  airplaneCompasFeature.setStyle(new _style.Style({
+    stroke: new _style.Stroke({
+      color: 'white',
+      width: 20
+    }),
+    fill: new _style.Fill({
+      color: 'rgba(255,255,255,0.2)'
+    })
+  }));
+  vectorSource.addFeature(airPlaneFeature);
+  vectorSource.addFeature(airplaneCompasFeature);
+};
+},{"ol/Feature.js":"node_modules/ol/Feature.js","ol/Map.js":"node_modules/ol/Map.js","ol/View.js":"node_modules/ol/View.js","ol/format/GeoJSON.js":"node_modules/ol/format/GeoJSON.js","ol/geom/Circle.js":"node_modules/ol/geom/Circle.js","ol/layer.js":"node_modules/ol/layer.js","ol/source.js":"node_modules/ol/source.js","ol/style.js":"node_modules/ol/style.js","ol/geom/Point.js":"node_modules/ol/geom/Point.js","ol/proj.js":"node_modules/ol/proj.js","circle-slider":"node_modules/circle-slider/lib/index.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -58828,7 +59432,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56882" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50580" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
