@@ -59373,7 +59373,7 @@ window.map = new _Map.default({
 
 window.addMainAirplane = function () {
   var airPlaneFeature = new _Feature.default({
-    geometry: new _Point.default((0, _proj.fromLonLat)([34, 33]))
+    geometry: new _Point.default((0, _proj.fromLonLat)([35.5, 33]))
   });
   airPlaneFeature.setStyle(new _style.Style({
     image: new _style.Icon(
@@ -59384,25 +59384,59 @@ window.addMainAirplane = function () {
       rotateWithView: true,
       color: [255, 255, 0],
       crossOrigin: 'anonymous',
-      // src: 'https://192.168.56.1:8080/icon.png'
+      //src: './resource/icon.png',
       // src: 'https://openlayers.org/en/v5.3.0/examples/data/icon.png'
-      src: 'resources/airplane2.png'
+      src: './resources/airplane2.png'
     })
   }));
-  var airplaneCompasFeature = new _Feature.default({
-    geometry: new _Circle.default((0, _proj.fromLonLat)([34, 33]), 10000000)
+  /* var airplaneCompasFeature = new Feature({
+      geometry: new Circle(fromLonLat([34, 33]), 10000000),
+  }
+  );
+  airplaneCompasFeature.setStyle(
+      new Style({
+          stroke: new Stroke({
+              color: 'white',
+              width: 20
+          }),
+          fill: new Fill({
+              color: 'rgba(255,255,255,0.2)'
+          })
+      })
+  ) */
+
+  var airplaneCompassFeature = new _Feature.default({
+    geometry: new _Point.default((0, _proj.fromLonLat)([35.5, 33]))
   });
-  airplaneCompasFeature.setStyle(new _style.Style({
-    stroke: new _style.Stroke({
-      color: 'white',
-      width: 20
-    }),
-    fill: new _style.Fill({
-      color: 'rgba(255,255,255,0.2)'
+  airplaneCompassFeature.setStyle(new _style.Style({
+    image: new _style.Icon({
+      // size: [600, 600],
+      scale: 1.5,
+      rotateWithView: true,
+      color: [0, 100, 0],
+      crossOrigin: 'anonymous',
+      //src: './resource/icon.png',
+      // src: 'https://openlayers.org/en/v5.3.0/examples/data/icon.png'
+      src: './resources/compass.svg'
+    })
+  }));
+  var textFeature = new _Feature.default({
+    geometry: new _Point.default((0, _proj.fromLonLat)([35.5, 33]))
+  });
+  setStyle(new _style.Style({
+    image: new _style.Icon({
+      // size: [600, 600],
+      scale: 1.5,
+      rotateWithView: true,
+      color: [0, 100, 0],
+      crossOrigin: 'anonymous',
+      //src: './resource/icon.png',
+      // src: 'https://openlayers.org/en/v5.3.0/examples/data/icon.png'
+      src: './resources/compass.svg'
     })
   }));
   vectorSource.addFeature(airPlaneFeature);
-  vectorSource.addFeature(airplaneCompasFeature);
+  vectorSource.addFeature(airplaneCompassFeature);
 };
 },{"ol/Feature.js":"node_modules/ol/Feature.js","ol/Map.js":"node_modules/ol/Map.js","ol/View.js":"node_modules/ol/View.js","ol/format/GeoJSON.js":"node_modules/ol/format/GeoJSON.js","ol/geom/Circle.js":"node_modules/ol/geom/Circle.js","ol/layer.js":"node_modules/ol/layer.js","ol/source.js":"node_modules/ol/source.js","ol/style.js":"node_modules/ol/style.js","ol/geom/Point.js":"node_modules/ol/geom/Point.js","ol/proj.js":"node_modules/ol/proj.js","circle-slider":"node_modules/circle-slider/lib/index.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
@@ -59432,7 +59466,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50580" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53927" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

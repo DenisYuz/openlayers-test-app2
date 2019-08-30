@@ -247,7 +247,7 @@ window.map = new Map({
 
 window.addMainAirplane = function () {
     var airPlaneFeature = new Feature({
-        geometry: new Point(fromLonLat([34, 33]))
+        geometry: new Point(fromLonLat([35.5, 33]))
     });
     airPlaneFeature.setStyle(new Style({
         image: new Icon(/** @type {module: ol/style/Icon~Options} */({
@@ -256,12 +256,12 @@ window.addMainAirplane = function () {
             rotateWithView: true,
             color: [255, 255, 0],
             crossOrigin: 'anonymous',
-            // src: 'https://192.168.56.1:8080/icon.png'
+            //src: './resource/icon.png',
             // src: 'https://openlayers.org/en/v5.3.0/examples/data/icon.png'
-            src: 'resources/airplane2.png'
+            src: './resources/airplane2.png'
         }))
     }))
-    var airplaneCompasFeature = new Feature({
+    /* var airplaneCompasFeature = new Feature({
         geometry: new Circle(fromLonLat([34, 33]), 10000000),
     }
     );
@@ -275,9 +275,42 @@ window.addMainAirplane = function () {
                 color: 'rgba(255,255,255,0.2)'
             })
         })
-    )
+    ) */
+    var airplaneCompassFeature = new Feature({
+        geometry: new Point(fromLonLat([35.5, 33]))
+    });
+    airplaneCompassFeature.setStyle(new Style({
+        image: new Icon(({
+            // size: [600, 600],
+            scale: 1.5,
+            rotateWithView: true,
+            color: [0, 100, 0],
+            crossOrigin: 'anonymous',
+            //src: './resource/icon.png',
+            // src: 'https://openlayers.org/en/v5.3.0/examples/data/icon.png'
+            src: './resources/compass.svg'
+        }))
+    }));
+
+    var textFeature = new Feature({
+        geometry: new Point(fromLonLat([35.5, 33]))
+    });
+    setStyle(new Style({
+        image: new Icon(({
+            // size: [600, 600],
+            scale: 1.5,
+            rotateWithView: true,
+            color: [0, 100, 0],
+            crossOrigin: 'anonymous',
+            //src: './resource/icon.png',
+            // src: 'https://openlayers.org/en/v5.3.0/examples/data/icon.png'
+            src: './resources/compass.svg'
+        }))
+    }));
+
+
     vectorSource.addFeature(airPlaneFeature);
-    vectorSource.addFeature(airplaneCompasFeature);
+    vectorSource.addFeature(airplaneCompassFeature);
 
 }
 

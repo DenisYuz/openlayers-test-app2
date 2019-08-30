@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<svg version="1.1" id="compass" xmlns="http://www.w3.org/2000/svg"
+	 viewBox="0 0 100 100" width="1000" height="1000">
+
+        <circle id="face" cx="50" cy="50" r="45" stroke="white" stroke-width="1" fill="white" fill-opacity="0.0" />
+        <!-- the compass face -->
+
+        <g id="ticks" stroke="white" stroke-width="0.5" fill="white">
+            <!-- 12 hour tick marks -->
+            <line x1='50' y1='5.000' x2='50.00' y2='7.00' />
+            <line x1='72.50' y1='11.03' x2='70.00' y2='15.36' />
+            <line x1='88.97' y1='27.50' x2='84.64' y2='30.00' />
+            <line x1='95.00' y1='50.00' x2='90.00' y2='50.00' />
+            <line x1='88.97' y1='72.50' x2='84.64' y2='70.00' />
+            <line x1='72.50' y1='88.97' x2='70.00' y2='84.64' />
+            <line x1='50.00' y1='95.00' x2='50.00' y2='92.00' />
+            <line x1='27.50' y1='88.97' x2='30.00' y2='84.64' />
+            <line x1='11.03' y1='72.50' x2='15.36' y2='70.00' />
+            <line x1='5.000' y1='50.00' x2='10.00' y2='50.00' />
+            <line x1='11.03' y1='27.50' x2='15.36' y2='30.00' />
+            <line x1='27.50' y1='11.03' x2='30.00' y2='15.36' />
+        </g>
+
+        <g id="poles" stroke="white"
+        fill="white" font-size="6px" font-family="Adobe Clean Light">
+            <!-- Number the cardinal directions-->
+            <text x="48" y="12">N</text><text x="85" y="53">E</text>
+            <text x="48" y="91">S</text><text x="11" y="53">W</text>
+        </g>
+    </svg>
