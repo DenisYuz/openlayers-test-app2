@@ -59411,9 +59411,9 @@ window.addMainAirplane = function () {
   airplaneCompassFeature.setStyle(new _style.Style({
     image: new _style.Icon({
       // size: [600, 600],
-      scale: 1.5,
+      scale: 0.8,
       rotateWithView: true,
-      color: [0, 100, 0],
+      color: 'rgba(0, 100, 0, 0.5)',
       crossOrigin: 'anonymous',
       //src: './resource/icon.png',
       // src: 'https://openlayers.org/en/v5.3.0/examples/data/icon.png'
@@ -59423,20 +59423,20 @@ window.addMainAirplane = function () {
   var textFeature = new _Feature.default({
     geometry: new _Point.default((0, _proj.fromLonLat)([35.5, 33]))
   });
-  setStyle(new _style.Style({
+  textFeature.setStyle(new _style.Style({
     image: new _style.Icon({
       // size: [600, 600],
-      scale: 1.5,
+      scale: 3,
       rotateWithView: true,
-      color: [0, 100, 0],
+      color: [0, 100, 0, 0.5],
       crossOrigin: 'anonymous',
       //src: './resource/icon.png',
       // src: 'https://openlayers.org/en/v5.3.0/examples/data/icon.png'
-      src: './resources/compass.svg'
+      src: './resources/text.svg'
     })
   }));
   vectorSource.addFeature(airPlaneFeature);
-  vectorSource.addFeature(airplaneCompassFeature);
+  vectorSource.addFeature(airplaneCompassFeature); //vectorSource.addFeature(textFeature);
 };
 },{"ol/Feature.js":"node_modules/ol/Feature.js","ol/Map.js":"node_modules/ol/Map.js","ol/View.js":"node_modules/ol/View.js","ol/format/GeoJSON.js":"node_modules/ol/format/GeoJSON.js","ol/geom/Circle.js":"node_modules/ol/geom/Circle.js","ol/layer.js":"node_modules/ol/layer.js","ol/source.js":"node_modules/ol/source.js","ol/style.js":"node_modules/ol/style.js","ol/geom/Point.js":"node_modules/ol/geom/Point.js","ol/proj.js":"node_modules/ol/proj.js","circle-slider":"node_modules/circle-slider/lib/index.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
@@ -59466,7 +59466,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53927" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55725" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

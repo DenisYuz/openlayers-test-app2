@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "parcel index.html",
-    "build": "parcel build --public-url . index.html"
+    "build": "parcel build --public-url . index.html",
+    "copyResources": "cp './resource/*' './dist/resources/' "
   },
   "author": "",
   "license": "ISC",
@@ -16,5 +17,11 @@
   },
   "devDependencies": {
     "parcel-bundler": "^1.12.3"
-  }
+  },
+  "copyFiles": [
+    {
+      "from": "./resource",
+      "to": "/dist/resources"
+    }
+  ]
 }

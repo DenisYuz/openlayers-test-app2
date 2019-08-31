@@ -282,9 +282,9 @@ window.addMainAirplane = function () {
     airplaneCompassFeature.setStyle(new Style({
         image: new Icon(({
             // size: [600, 600],
-            scale: 1.5,
+            scale: 0.8,
             rotateWithView: true,
-            color: [0, 100, 0],
+            color: 'rgba(0, 100, 0, 0.5)',
             crossOrigin: 'anonymous',
             //src: './resource/icon.png',
             // src: 'https://openlayers.org/en/v5.3.0/examples/data/icon.png'
@@ -295,22 +295,23 @@ window.addMainAirplane = function () {
     var textFeature = new Feature({
         geometry: new Point(fromLonLat([35.5, 33]))
     });
-    setStyle(new Style({
+    textFeature.setStyle(new Style({
         image: new Icon(({
             // size: [600, 600],
-            scale: 1.5,
+            scale: 3,
             rotateWithView: true,
-            color: [0, 100, 0],
+            color: [0, 100, 0, 0.5],
             crossOrigin: 'anonymous',
             //src: './resource/icon.png',
             // src: 'https://openlayers.org/en/v5.3.0/examples/data/icon.png'
-            src: './resources/compass.svg'
+            src: './resources/text.svg'
         }))
     }));
 
 
     vectorSource.addFeature(airPlaneFeature);
     vectorSource.addFeature(airplaneCompassFeature);
+    //vectorSource.addFeature(textFeature);
 
 }
 
