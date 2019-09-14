@@ -59420,23 +59420,24 @@ window.addMainAirplane = function () {
       src: './resources/compass.svg'
     })
   }));
-  var textFeature = new _Feature.default({
+  var flightDirectionFeature = new _Feature.default({
     geometry: new _Point.default((0, _proj.fromLonLat)([35.5, 33]))
   });
-  textFeature.setStyle(new _style.Style({
+  flightDirectionFeature.setStyle(new _style.Style({
     image: new _style.Icon({
       // size: [600, 600],
-      scale: 3,
-      rotateWithView: true,
-      color: [0, 100, 0, 0.5],
+      scale: 0.8,
+      rotateWithView: false,
+      color: [255, 0, 0, 0.5],
       crossOrigin: 'anonymous',
       //src: './resource/icon.png',
       // src: 'https://openlayers.org/en/v5.3.0/examples/data/icon.png'
-      src: './resources/text.svg'
+      src: './resources/flightDirection.svg'
     })
   }));
   vectorSource.addFeature(airPlaneFeature);
-  vectorSource.addFeature(airplaneCompassFeature); //vectorSource.addFeature(textFeature);
+  vectorSource.addFeature(airplaneCompassFeature);
+  vectorSource.addFeature(flightDirectionFeature);
 };
 },{"ol/Feature.js":"node_modules/ol/Feature.js","ol/Map.js":"node_modules/ol/Map.js","ol/View.js":"node_modules/ol/View.js","ol/format/GeoJSON.js":"node_modules/ol/format/GeoJSON.js","ol/geom/Circle.js":"node_modules/ol/geom/Circle.js","ol/layer.js":"node_modules/ol/layer.js","ol/source.js":"node_modules/ol/source.js","ol/style.js":"node_modules/ol/style.js","ol/geom/Point.js":"node_modules/ol/geom/Point.js","ol/proj.js":"node_modules/ol/proj.js","circle-slider":"node_modules/circle-slider/lib/index.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
