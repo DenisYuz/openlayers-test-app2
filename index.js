@@ -9,7 +9,7 @@ import { Icon, Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style.js';
 import Point from 'ol/geom/Point.js';
 import { fromLonLat } from 'ol/proj.js';
 import CircleSlider from "circle-slider";
-
+/// test
 
 
 
