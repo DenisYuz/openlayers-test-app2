@@ -9,12 +9,16 @@ import { Icon, Circle as CircleStyle, Fill, Stroke, Style, Text } from 'ol/style
 import Point from 'ol/geom/Point.js';
 import { fromLonLat, toLonLat } from 'ol/proj.js';
 import CircleSlider from "circle-slider";
-import { Overlay } from 'ol';
+import { Overlay } from "ol";
 import MousePosition from 'ol/control/MousePosition';
 import { Control, defaults as defaultControls } from 'ol/control';
 import Polygon from 'ol/geom/Polygon';
 import * as olPixel from 'ol/pixel';
-import { lineString, lineIntersect } from '@turf/turf';
+import { lineString, lineIntersect, circle } from '@turf/turf';
+
+import { transform } from 'ol/proj';
+
+
 
 window.Control = Control;
 
@@ -178,7 +182,7 @@ var vectorSource = new VectorSource({
     features: (new GeoJSON()).readFeatures(geojsonObject)
 });
 
-vectorSource.addFeature(new Feature(new Circle([32, 35], 0.5)));
+vectorSource.addFeature(new Feature(new Circle(fromLonLat([35, 32]), 500)));
 
 var vectorLayer = new VectorLayer({
 
@@ -270,8 +274,8 @@ window.map = new Map({
     ],
     target: 'map',
     view: new View({
-        projection: 'EPSG:4326',
-        center: [34.76135112248274, 32.278446848732656],
+        projection: 'EPSG:3857',
+        center: transform([34.76135112248274, 32.278446848732656], 'EPSG:4326', 'EPSG:3857'),
         zoom: 10
     }),
 });
@@ -359,7 +363,7 @@ window.addWeatherReport = function () {
                 "L", s3.x, s3.y, "A", r2, r2, 0, 0, 0, s4.x, s4.y,
                 "L", s1.x, s1.y, "Z"].join(" ");
             let color = weatherColors[getRandomInt(0, 3)];
-            inlineSvgWeather += `<path transform="rotate(${sectorAngle} ${c.x} ${c.y})" fill="${color}" strokewidth="0.1" d="${d}"/>`;
+            inlineSvgWeather += `<path transform="rotate(${sectorAngle} ${c.x} ${c.y})" fill="${color}" stroke-width="1" d="${d}"/>`;
         }
     }
     inlineSvgWeather += `</g> </svg > `;
@@ -538,5 +542,59 @@ window.addIconWithText = function () {
         }));
 
     vectorSource2.addFeature(airPlaneFeature);
+}
+
+window.addPopup = () => {
+    var popup = new Overlay({
+        position: [34, 32],
+        positioning: 'center-center',
+        element: document.getElementById('popup'),
+        stopEvent: false,
+    });
+    map.addOverlay(popup);
+}
+
+
+window.overlay = new Overlay({
+    element: document.getElementById('circleSliderID'),
+    autoPan: true,
+    autoPanAnimation: {
+        duration: 250
+    }
+});
+map.addOverlay(overlay);
+
+map.on('singleclick', function (event) {
+
+    if (map.hasFeatureAtPixel(event.pixel) === true) {
+        var coordinate = event.coordinate;
+
+        content.innerHTML = '<b>Hello world!</b><br />I am a popup.';
+        window.overlay.setPosition(coordinate);
+    } else {
+        window.overlay.setPosition(coordinate);
+    }
+});
+
+
+window.addTurfCircle = () => {
+    var format = new GeoJSON();
+    var center = [35, 75];
+    var radius = 50;
+    var options = { steps: 100, units: "kilometers", properties: { foo: "bar" } };
+    var circlePolygon = format.readFeature(circle(center, radius, options));
+    console.log("circle:" + circle);
+
+    circlePolygon.getGeometry().transform("EPSG:4326", "EPSG:3857");
+
+    // const feature = new Feature({
+    //     type: "polygon",
+    //     geometry: circlePolygon,
+    //     color: 'red'
+    // });
+
+    // style(feature);
+
+    vectorSource.addFeature(circlePolygon);
 }
 

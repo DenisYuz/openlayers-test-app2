@@ -71527,6 +71527,8 @@ var olPixel = _interopRequireWildcard(require("ol/pixel"));
 
 var _turf = require("@turf/turf");
 
+var _proj2 = require("ol/proj");
+
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
@@ -71679,7 +71681,7 @@ var geojsonObject = {
 var vectorSource = new _source.Vector({
   features: new _GeoJSON.default().readFeatures(geojsonObject)
 });
-vectorSource.addFeature(new _Feature.default(new _Circle.default([32, 35], 0.5)));
+vectorSource.addFeature(new _Feature.default(new _Circle.default((0, _proj.fromLonLat)([35, 32]), 500)));
 var vectorLayer = new _layer.Vector({
   source: vectorSource,
   style: styleFunction
@@ -71746,8 +71748,8 @@ window.map = new _Map.default({
   }), vectorLayer, vectorLayer2],
   target: 'map',
   view: new _View.default({
-    projection: 'EPSG:4326',
-    center: [34.76135112248274, 32.278446848732656],
+    projection: 'EPSG:3857',
+    center: (0, _proj2.transform)([34.76135112248274, 32.278446848732656], 'EPSG:4326', 'EPSG:3857'),
     zoom: 10
   })
 });
@@ -71826,7 +71828,7 @@ window.addWeatherReport = function () {
       var s4 = polarToCartesian(c.x, c.y, r + stepRadius, angleStart);
       var d = ["M", s1.x, s1.y, "A", r, r, 0, 0, 1, s2.x, s2.y, "L", s3.x, s3.y, "A", r2, r2, 0, 0, 0, s4.x, s4.y, "L", s1.x, s1.y, "Z"].join(" ");
       var color = weatherColors[getRandomInt(0, 3)];
-      inlineSvgWeather += "<path transform=\"rotate(".concat(sectorAngle, " ").concat(c.x, " ").concat(c.y, ")\" fill=\"").concat(color, "\" strokewidth=\"0.1\" d=\"").concat(d, "\"/>");
+      inlineSvgWeather += "<path transform=\"rotate(".concat(sectorAngle, " ").concat(c.x, " ").concat(c.y, ")\" fill=\"").concat(color, "\" stroke-width=\"1\" d=\"").concat(d, "\"/>");
     }
   }
 
@@ -71975,7 +71977,58 @@ window.addIconWithText = function () {
   }));
   vectorSource2.addFeature(airPlaneFeature);
 };
-},{"ol/Feature.js":"node_modules/ol/Feature.js","ol/Map.js":"node_modules/ol/Map.js","ol/View.js":"node_modules/ol/View.js","ol/format/GeoJSON.js":"node_modules/ol/format/GeoJSON.js","ol/geom/Circle.js":"node_modules/ol/geom/Circle.js","ol/layer.js":"node_modules/ol/layer.js","ol/source.js":"node_modules/ol/source.js","ol/style":"node_modules/ol/style.js","ol/geom/Point.js":"node_modules/ol/geom/Point.js","ol/proj.js":"node_modules/ol/proj.js","circle-slider":"node_modules/circle-slider/lib/index.js","ol":"node_modules/ol/index.js","ol/control/MousePosition":"node_modules/ol/control/MousePosition.js","ol/control":"node_modules/ol/control.js","ol/geom/Polygon":"node_modules/ol/geom/Polygon.js","ol/pixel":"node_modules/ol/pixel.js","@turf/turf":"node_modules/@turf/turf/turf.min.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+
+window.addPopup = function () {
+  var popup = new _ol.Overlay({
+    position: [34, 32],
+    positioning: 'center-center',
+    element: document.getElementById('popup'),
+    stopEvent: false
+  });
+  map.addOverlay(popup);
+};
+
+window.overlay = new _ol.Overlay({
+  element: document.getElementById('circleSliderID'),
+  autoPan: true,
+  autoPanAnimation: {
+    duration: 250
+  }
+});
+map.addOverlay(overlay);
+map.on('singleclick', function (event) {
+  if (map.hasFeatureAtPixel(event.pixel) === true) {
+    var coordinate = event.coordinate;
+    content.innerHTML = '<b>Hello world!</b><br />I am a popup.';
+    window.overlay.setPosition(coordinate);
+  } else {
+    window.overlay.setPosition(coordinate);
+  }
+});
+
+window.addTurfCircle = function () {
+  var format = new _GeoJSON.default();
+  var center = [35, 75];
+  var radius = 50;
+  var options = {
+    steps: 100,
+    units: "kilometers",
+    properties: {
+      foo: "bar"
+    }
+  };
+  var circlePolygon = format.readFeature((0, _turf.circle)(center, radius, options));
+  console.log("circle:" + _turf.circle);
+  circlePolygon.getGeometry().transform("EPSG:4326", "EPSG:3857"); // const feature = new Feature({
+  //     type: "polygon",
+  //     geometry: circlePolygon,
+  //     color: 'red'
+  // });
+  // style(feature);
+
+  vectorSource.addFeature(circlePolygon);
+};
+},{"ol/Feature.js":"node_modules/ol/Feature.js","ol/Map.js":"node_modules/ol/Map.js","ol/View.js":"node_modules/ol/View.js","ol/format/GeoJSON.js":"node_modules/ol/format/GeoJSON.js","ol/geom/Circle.js":"node_modules/ol/geom/Circle.js","ol/layer.js":"node_modules/ol/layer.js","ol/source.js":"node_modules/ol/source.js","ol/style":"node_modules/ol/style.js","ol/geom/Point.js":"node_modules/ol/geom/Point.js","ol/proj.js":"node_modules/ol/proj.js","circle-slider":"node_modules/circle-slider/lib/index.js","ol":"node_modules/ol/index.js","ol/control/MousePosition":"node_modules/ol/control/MousePosition.js","ol/control":"node_modules/ol/control.js","ol/geom/Polygon":"node_modules/ol/geom/Polygon.js","ol/pixel":"node_modules/ol/pixel.js","@turf/turf":"node_modules/@turf/turf/turf.min.js","ol/proj":"node_modules/ol/proj.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -72003,7 +72056,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54845" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55069" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
